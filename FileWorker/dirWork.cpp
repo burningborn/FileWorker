@@ -37,30 +37,23 @@ void dirWork::dirMenu()
 		{
 		case '1':
 			make();
+			choice = '0';
 			break;
 		case '2':
 			reMove();
+			choice = '0';
 			break;
 		case '3':
 			reName();
+			choice = '0';
 			break;
 		case '4':
-			system("cls");
-			char Source[MAX_PATH];
-			char Destination[MAX_PATH];
-			cout << "Введите имя и путь к копируемой директории: ";
-			cin.getline(Source, MAX_PATH);
-			cout << "Введите имя и путь к директории назначения: ";
-			cin.getline(Destination, MAX_PATH);
-			coPy(Source, Destination);
-			//Copy_Directory(Source, Destination);
-			//cout << "Скопировано: " << CountDir << " папка(и) и " << CountFile << " файл(а)!" << endl << endl;
-			system("pause");
-			cout << endl;
-			system("cls");
+			//coPy();
+			choice = '0';
 			break;
 		case '5':
 			//moVe();
+			choice = '0';
 			break;
 		case '6':
 			break;
@@ -98,10 +91,8 @@ void dirWork::reName()
 {
 	system("cls");
 	char oldName[MAX_PATH], newName[MAX_PATH];
-	//Получаем имя и путь к текущему имени директории и сохраняем в переменную oldName
 	cout << "Введите текущее имя директории и путь:";
 	cin >> oldName;
-	//Новое имя и путь директории и сохраняем в переменную newName
 	cout << "Введите новое имя директории и путь:";
 	cin >> newName;
 	//Производим переименование директории
@@ -110,11 +101,12 @@ void dirWork::reName()
 	else
 		cout << "Ok...\n";
 }
-void dirWork::coPy(const char* Source, const char* Destination)
+void dirWork::coPy(const char* Src, const char* Dst)
 {
 
 }
-
-void dirWork::moVe(const char* Source, const char* Destination)
+void dirWork::moVe(const char* Src, const char* Dst)
 {
 }
+void dirWork::showDir() {};
+

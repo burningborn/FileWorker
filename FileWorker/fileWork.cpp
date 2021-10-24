@@ -1,5 +1,9 @@
 ﻿#include <iostream>
+#include <string.h>
+#include <string>
+#include <stdexcept>
 #include <Windows.h>
+#include <fstream>
 #include <direct.h>
 #include <stdio.h>
 #include <io.h>
@@ -9,27 +13,19 @@ using namespace std;
 
 void fileWork::fileMenu()
 {
-	system("cls");
-	//предлагаем пользователю выбрать действие
-	cout << "\n Пожалуйста, выберите действие...\n";
-	//записываем выбор пользователя в переменную
-	char choice;
+		//записываем выбор пользователя в переменную
+		char choice;
 	do
 	{
-		//создать папку или файл
-		cout << "\n 1 - Создание файла\n";
-		//удалить папку или файл
+		system("cls");		
+		cout << "\n Пожалуйста, выберите действие...\n\n";
+		cout << " 1 - Создание файла\n";
 		cout << " 2 - Удаление файла\n";
-		//переименовать папку или файл
 		cout << " 3 - Переименование файла\n";
-		//копировать/перенести папку или файл
 		cout << " 4 - Копирование файла\n";
-		//вычислить размер папки или файла
 		cout << " 5 - Перемещение файла\n";
-		//поиск по маске
-		cout << " 6 - Поиск по маске\n";
-		//выход из программы
-		cout << "\n 0 - Выход\n";
+		cout << " 6 - Поиск по маске***\n";
+		cout << "\n 0 - Выход\n ";
 		//принимаем выбор пользователя
 		cin >> choice;
 		//анализируем выбор и вызываем соответсвующее действие
@@ -37,43 +33,44 @@ void fileWork::fileMenu()
 		{
 		case '1':
 			make();
+			choice = '0';
 			break;
 		case '2':
 			reMove();
+			choice = '0';
 			break;
 		case '3':
 			reName();
+			choice = '0';
 			break;
 		case '4':
 		{
 			system("cls");
-			char Source[MAX_PATH];
-			char Destination[MAX_PATH];
+			char Src[MAX_PATH], Dest[MAX_PATH];
 			cout << "Введите имя и путь к исходному файлу: ";
-			cin >> Source;
+			cin >> Src;
 			cout << "Введите имя и путь к файлу назначения: ";
-			cin >> Destination;			
-			coPy(Source, Destination);
-			cout << "Файл успешно скопирован!\n\n";
-			system("pause");
-			cout << endl;
+			cin >> Dest;			
+			coPy(Src, Dest);
+			choice = '0';
 		}
 			break;
 		case '5':
 		{
 			system("cls");
-			char Source[MAX_PATH];
-			char Destination[MAX_PATH];
+			char Src[MAX_PATH];
+			char Dest[MAX_PATH];
 			cout << "Введите имя и путь к исходному файлу: ";
-			cin >> Source;
+			cin >> Src;
 			cout << "Введите имя и путь к файлу назначения: ";
-			cin >> Destination;
-			moVe(Source, Destination);
+			cin >> Dest;
+			moVe(Src, Dest);
+			choice = '0';
 		}
 			break;
 		case '6':
-			break;
-		case '7':
+			searchMask();
+			choice = '0';
 			break;
 		}
 	} while (choice != '0');//выход из программы
@@ -82,151 +79,124 @@ void fileWork::fileMenu()
 void fileWork::make()
 {
 	system("cls");
-	char name[MAX_PATH];	// define MAX_PATH - максимальный путь 260 символов.
-	cout << "Введите имя для создания файла с указаннием пути: ";
+	char name[MAX_PATH];	// Переменная для записи названия и пути файла.
+	cout << "Введите имя и путь для создания файла: \n\n";
 	cin >> name;
-	FILE* check;
-	if (!fopen_s(&check, name, "r") != 0)	// Ïîïûòêà îòêðûòü ôàéë íà ÷òåíèå.
+	ofstream out;
+	out.open(name);
+	if (!out.is_open())	// Проверка на открытие файла
 	{
-		cout << "Файл с таким именем уже существует!\n\n";
-		fclose(check);
-		return;
+		cout << "Ошибка создания файла!\n\n";		
 	}
-	fopen_s(&check, name, "w");	// Îòêðûòèå ôàéëà íà çàïèñü (ñîçäàíèå).
-	if (!check)	// Åñëè óêàçàòåëü íà ôàéë íóëåâîé.
+	else
 	{
-		cout << "Ошибка создания файла!" << endl << endl;
-		return;
+	cout << "Файл успешно создан!\n\n";
 	}
-	cout << "Файл успешно создан!" << endl << endl;
-	fclose(check);
+	out.close();
 	system("pause");
-	cout << endl;
-	system("cls");
 }
 void fileWork::reMove()
 {
 	system("cls");
-	char name[MAX_PATH];	// Òåêóùåå è íîâîå èìÿ ôàéëà.
+	char name[MAX_PATH];	// 
 	cout << "Введите имя и путь файла для удаления: ";
 	cin >> name;
-	if (remove(name))		//	Óäàëèòü ôàéë è ïðîâåðèòü ðåçóëüòàò
+	if (remove(name))		//	
 	{
-		cout << "Ошибка! Невозможно переименовать файл.\n\n";
+		cout << "Ошибка! Невозможно удалить файл.\n\n";
 		return;
 	}
-	else cout << "Ok...\n\n";
+	else cout << "Файл успешно удалён!\n\n";
 	system("pause");
-	cout << endl;
-	system("cls");
 }
 void fileWork::reName()
 {
 	system("cls");
 	char oldName[MAX_PATH], newName[MAX_PATH];
 	//Получаем имя и путь к текущему имени директории и сохраняем в переменную oldName
-	cout << "Введите текущее имя и путь файла:";
+	cout << "Введите текущее имя и путь файла: ";
 	cin >> oldName;
 	//Новое имя и путь директории и сохраняем в переменную newName
-	cout << "Введите новое имя и путь файла:";
+	cout << "Введите новое имя и путь файла: ";
 	cin >> newName;
 	//Производим переименование директории
 	if (rename(oldName, newName) != 0)
 		cout << "Ошибка! Невозможно переименовать файл.\n";
 	else
-		cout << "Ok...\n";
+		cout << "Файл успешно переименован!\n";
+	system("pause");
 }
-void fileWork::coPy(const char* Source, const char* Destination)
+void fileWork::coPy(const char* Src, const char* Dst)
 {
-	// Указатели на файлы:
-	FILE* Src, * Dest;
-	// Открытие оригинального файла в бинарном(двоичном) режиме на чтение.
-	if (fopen_s(&Src, Source, "rb") != 0)
+	system("cls");
+	ifstream in(Src, ios::in | ios::binary); // открываем существующий файл на чтение
+	if (!in)
 	{
-		cout << "Файл не найден! Проверьте имя и путь к файлу!" << endl << endl;
-		return;
+		cout << " Невозможно открыть файл на чтение! \n";
+		system("pause");
 	}
-	int hSrc = _fileno(Src);		// Получить дискриптор файла.
-	int Size = _filelength(hSrc);	// Определить размер файла.
-	char* Data = new char[Size];	// Выделить память под буфер для копирования содержимого файла.
-	if (!Data)
+	ofstream out(Dst, ios::out | ios::binary);  // создаём файл и открываем его на запись
+	if (!out)
 	{
-		cout << "Ошибка выделения памяти, при создании буфера для копирования файла!" << endl << endl;
-		fclose(Src);
-		return;
+		cout << " Невозможно открыть файл на запись! \n";
+		system("pause");
 	}
-	if (fopen_s(&Dest, Destination, "wb") != 0)	// Îòêðûâòèå ôàéëà íàçíà÷åíèÿ, â áèíàðíîì ðåæèìå íà çàïèñü.
-	{
-		cout << "Ошибка копирования файла! Проверьте имя и путь назначения!" << endl << endl;
-		fclose(Src);
-		delete[] Data;
-		return;
-	}
-	int DataValue;		// Объем данных.
-	// Считать данные:
-	while (!feof(Src))	// Пока н до ли до конца ис одно о файла.
-	{
-		// Считать данные в строку Data, подсчитывая объем данных в строке и помещая его в DataValue
-		DataValue = fread(Data, sizeof(char), Size, Src);			// fread работает в бинарном режиме.
-		if (DataValue)fwrite(Data, sizeof(char), DataValue, Dest);	// Записать строку в файл назначения.
-		else break;	// Если закончились данные заканчиваем запись.
-	}
-	// Закрыть файлы:
-	fclose(Src);
-	fclose(Dest);
-	// Освобождение памяти, выделенную под буфер.
-	delete[] Data;
+	out << in.rdbuf();  //Копируем информацию из вайла в файл
+	in.close();			//Закрываем файл
+	out.close();		//Закрываем файл
+	cout << "Файл успешно скопирован!\n";
+	system("pause");
 }
-
-void fileWork::moVe(const char* Source, const char* Destination)
+void fileWork::moVe(const char* Src, const char* Dst)
 {
-	// Указатели на файлы:
-	FILE* Src, * Dest;
-	// Открытие оригинального файла в бинарном(двоичном) режиме на чтение.
-	if (fopen_s(&Src, Source, "rb") != 0)
+	system("cls");
+	ifstream in(Src, ios::in | ios::binary);     //Открываем исходный файл на чтение 
+	if (!in)
 	{
-		cout << "Файл не найден! Проверьте имя и путь к файлу!" << endl << endl;
+		cout << " Невозможно открыть файл на чтение! \n";
+		system("pause");
+	}
+	ofstream out(Dst, ios::out | ios::binary);   //Открываем принимающий файл на запись
+	if (!out)
+	{
+		cout << " Невозможно открыть файл на запись! \n";
+		system("pause");
+	}
+	out << in.rdbuf();              //Копируем информацию из вайла в файл
+	in.close();						//Закрываем файл
+	out.close();					//Закрываем файл
+	if (remove(Src))				//Удаляем исходный файл	
+	{
+		cout << "Ошибка! Невозможно удалить исходный файл.\n\n";
 		return;
 	}
-	int hSrc = _fileno(Src);		// Получить дискриптор файла.
-	int Size = _filelength(hSrc);	// Определить размер файла.
-	char* Data = new char[Size];	// Выделить память под буфер для копирования содержимого файла.
-	if (!Data)
+	cout << "Файл успешно перемещён!\n";
+	system("pause");
+}
+void fileWork::searchMask()
+{
+	system("cls");
+	char Path[MAX_PATH];		// Запрос пути к файлу
+	cout << "Введите путь к директории для поиска файлов: ";
+	cin >> Path;
+	char Mask[MAX_PATH];		// Запрос маски для поиска файла
+	cout << "Введите маску для поиска файлов (например *.* или *.txt): ";
+	cin >> Mask;
+	char FullPath[MAX_PATH];	// Соединение пути и маски
+	strcpy_s(FullPath, Path);	// Копирование
+	strcat_s(FullPath, Mask);	// Добавление.
+	_finddata_t* InfoFile = new _finddata_t;	// Создание объекта структуры, хранящей данные о файлах.
+	long Done = _findfirst(FullPath, InfoFile);	// Поиск.
+	int MayWeWork = Done;		// Переменная, чтобы в неё последующие поиски их результаты помещать.
+	int Count = 0;				// Счетчик количества найденных файлов.
+	while (MayWeWork != -1)
 	{
-		cout << "Ошибка выделения памяти, при создании буфера для копирования файла!" << endl << endl;
-		fclose(Src);
-		return;
+		Count++;
+		cout << InfoFile->name << endl;			// Вывод имени найденного файла.
+		MayWeWork = _findnext(Done, InfoFile);	// Поиск следующего файла.
 	}
-	if (fopen_s(&Dest, Destination, "wb") != 0)	// Îòêðûâòèå ôàéëà íàçíà÷åíèÿ, â áèíàðíîì ðåæèìå íà çàïèñü.
-	{
-		cout << "Ошибка копирования файла! Проверьте имя и путь назначения!" << endl << endl;
-		fclose(Src);
-		delete[] Data;
-		return;
-	}
-	int DataValue;		// Объем данных.
-	// Считать данные:
-	while (!feof(Src))	// Пока н до ли до конца ис одно о файла.
-	{
-		// Считать данные в строку Data, подсчитывая объем данных в строке и помещая его в DataValue
-		DataValue = fread(Data, sizeof(char), Size, Src);			// fread работает в бинарном режиме.
-		if (DataValue)fwrite(Data, sizeof(char), DataValue, Dest);	// Записать строку в файл назначения.
-		else break;	// Если закончились данные заканчиваем запись.
-	}
-	// Закрыть файлы:
-	fclose(Src);
-	fclose(Dest);
-	// Освобождение памяти, выделенную под буфер.
-	delete[] Data;
-
-
-	const char* name = Source;
-	if (remove(name))		//Удаляем исходный файл
-	{
-		cout << "Ошибка! Невозможно переместить файл.\n\n";
-		return;
-	}
-	else cout << "Ok...\n\n";
+	cout << "Было найдено " << Count << " файл(а/ов) в директории " << Path << " по маске: " << Mask << endl << endl;
+	_findclose(Done);	//Освобождение памяти, выделеной под структуру finddata.
 	system("pause");
 	cout << endl;
 	system("cls");

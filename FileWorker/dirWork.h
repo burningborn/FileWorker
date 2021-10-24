@@ -16,7 +16,8 @@ public:
 	void make();
 	void reMove();
 	void reName();
-	void coPy(const char* Source, const char* Destination);
-	void moVe(const char* Source, const char* Destination);
+	void coPy(const char* Src, const char* Dst);
+	void moVe(const char* Src, const char* Dst);
+	void showDir();
 };
 
