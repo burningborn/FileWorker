@@ -9,7 +9,7 @@ class dirWork :
 {
 public:
 	dirWork() :entrance{}{}
-	~dirWork() {}
+	~dirWork() { cout << "Didtructir worked"; }
 
 	void dirMenu();
 
